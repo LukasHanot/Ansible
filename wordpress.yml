@@ -43,6 +43,27 @@
       stat: path=/var/run/reboot-required
       register: file_reboot_required
 
+
+    - name: reboot node
+      shell: sleep 2 && shutdown -r now "Reboot triggered by ansible"
+      async: 1
+      poll: 0
+      ignore_errors: true
+
+    # poll ssh port until we get a tcp connect
+    - name: wait for node to finish booting
+      become: false
+      local_action: wait_for host={{ ansible_ssh_host }}
+          port={{ ansible_port }}
+          state=started
+          delay=5
+          timeout=600
+
+    # give sshd time to start fully
+    - name: wait for ssh to start fully
+      pause:
+        seconds: 15
+
     # here starts the actual install previous was updates/upgrades
     - name: checking if apache2 is installed
       apt:
