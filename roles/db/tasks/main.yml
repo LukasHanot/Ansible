@@ -1,0 +1,42 @@
+---
+# This playbook will install mysql and create user/permissions
+#
+#
+
+- name: Install MySQL package
+  apt:
+    name: [ 'mysql-server', 'python-mysqldb', 'python-pymysql' ]
+    state: present
+
+
+- name: create my.cnf configuration file
+  template: src=my.cnf.j2 dest=/etc/mysql/my.cnf
+
+- name: Place .my.cnf in the user directory
+  template: src=.my.cnf.j2 dest=/root/.my.cnf
+
+- name: create mysqld.cnf configuration file
+  template: src=mysqld.cnf.j2 dest=/etc/mysql/mysql.conf.d/mysqld.cnf
+  notify: restart mysql
+
+- name: Start MySQL Service
+  service: name=mysql state=started enabled=yes
+
+- name: insert iptables rule
+  lineinfile: dest=/etc/sysconfig/iptables state=present regexp="{{ mysql_port }}" insertafter="^:OUTPUT " line="-A INPUT -p tcp  --dport {{ mysql_port }} -j  ACCEPT"
+  notify: restart iptables
+
+- name: Create Application Database
+  mysql_db: 
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    name: "{{ dbname }}"
+    state: present
+
+- name: Create Application DB User
+  mysql_user:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    name: "{{ dbuser }}" 
+    password: "{{ upassword }}" 
+    priv: "*.*:ALL host='%"
+    state: present
+  #become: no

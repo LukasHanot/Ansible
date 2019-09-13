@@ -1,0 +1,14 @@
+---
+# this file writes apache2 config files to the dest servers
+
+- name: write apache2.conf to server
+  template:
+    src: apache2.conf.j2
+    dest: /etc/apache2/apache2.conf
+    # notify: restart apache2
+
+- name: write dir config so apache looks for php files first
+  template:
+    src: dir.conf.j2
+    dest: /etc/apache2/mods-enabled/dir.conf
+  notify: restart apache2

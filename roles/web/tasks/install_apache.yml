@@ -1,0 +1,16 @@
+---
+# These tasks install apache, php, mysql and git
+
+- name: Install Apache, php and mysql
+  apt:
+    name: [ 'apache2', 'php', 'libapache2-mod-php', 'php-mcrypt', 'php-mysql' ]
+    state: present
+
+- name: insert iptables rule for apache
+  lineinfile: dest=/etc/sysconfig/iptables create=yes state=present regexp="{{ httpd_port }}" insertafter="^:OUTPUT " line="-A INPUT -p tcp  --dport {{ httpd_port }} -j  ACCEPT"
+  notify: restart iptables
+
+- name: apache service state
+  service: name=apache2 state=started enabled=yes
+
+

@@ -1,2 +1,6 @@
 infrastructure.ini
 
+.vault_pass
+secrets.yml
+vault.yml
+group_vars/vault.yml

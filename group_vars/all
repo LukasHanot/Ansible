@@ -1,0 +1,9 @@
+---
+# Variables listed here are applicable to all host groups
+
+httpd_port: 80
+repository: https://github.com/LukasHanot/scotlandia-site.git
+dbuser: "{{ vault_dbuser }}"
+upassword: "{{ vault_upassword }}"
+mysql_port: 3306
+dbname: wordpress_db

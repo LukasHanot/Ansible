@@ -1,0 +1,9 @@
+---
+# handler to handle DB notifications
+#
+
+- name: restart mysql
+  service: name=mysql state=restarted
+
+- name: restart iptables
+  service: name=iptables state=restarted
